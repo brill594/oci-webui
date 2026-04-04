@@ -20,7 +20,7 @@ export function RepoList() {
 
   const filtered = useMemo(() => {
     if (!data?.repositories) return [];
-    let repos = data.repositories.filter((r) =>
+    const repos = data.repositories.filter((r) =>
       r.toLowerCase().includes(search.toLowerCase())
     );
     repos.sort((a, b) =>

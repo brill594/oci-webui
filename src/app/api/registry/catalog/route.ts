@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthedClient } from "@/lib/registry/server";
+import { filterRepositoriesWithTags } from "@/lib/registry/catalog-filter";
 
 export async function GET(request: Request) {
   try {
@@ -11,7 +12,12 @@ export async function GET(request: Request) {
     const last = searchParams.get("last") ?? undefined;
 
     const catalog = await client.listRepositories(n, last);
-    return NextResponse.json(catalog);
+    const repositories = await filterRepositoriesWithTags(
+      catalog.repositories,
+      (name) => client.listTags(name)
+    );
+
+    return NextResponse.json({ ...catalog, repositories });
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
